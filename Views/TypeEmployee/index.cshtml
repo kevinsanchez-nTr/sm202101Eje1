@@ -1,0 +1,148 @@
+﻿@{
+    ViewData["Title"] = "Tipo de Empleados";
+}
+
+@section styles
+{
+    <link href="~/lib/datatables.net-bs5/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+    <style>
+        /* Encabezado de la tabla */
+        #myTable thead th {
+            background-color: #007bff; /* Color de fondo azul */
+            color: white; /* Color de texto blanco */
+            text-align: center; /* Centrado del texto */
+        }
+
+        /* Filas alternas de la tabla */
+        #myTable tbody tr:nth-child(odd) {
+            background-color: #f2f2f2; /* Color de fondo para filas impares */
+        }
+
+        #myTable tbody tr:nth-child(even) {
+            background-color: #ffffff; /* Color de fondo para filas pares */
+        }
+
+        /* Centrar texto de las celdas */
+        #myTable tbody td {
+            text-align: center; /* Centrar texto */
+        }
+    </style>
+}
+
+<h1 class="text-primary">Tipo de Empleado</h1>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <a asp-controller="TypeEmployee" asp-action="Create" class="btn btn-success">AGREGAR NUEVO TIPO DE USUARIO</a><br /><br/>
+    </div>
+</div>
+
+<table id="myTable" class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Tipo</th>
+            <th>FechaCreacion</th>
+            <th>FechaModificacion</th>
+            <th>¿Activo?</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in ViewBag.TypeEmployees)
+        {
+            <tr>
+                <td>@item.Nombre</td>
+                <td>@item.FechaCreacion</td>
+                <td>@item.FechaModificacion</td>
+                <td>@item.EsActivo</td>
+                <td class="text-center">
+                    <div class="btn-group" role="group">
+                        <a asp-controller="TypeEmployee" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Editar</a>
+                        <button class="btn btn-danger" onclick="confirmDelete(event, @item.Id)">Eliminar</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="~/lib/datatables.net-bs5/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var urlParams = new URLSearchParams(window.location.search);
+            var success = urlParams.get('success');
+            var editSuccess = urlParams.get('editSuccess');
+
+            if (success) {
+                Swal.fire({
+                    title: "¡Buen trabajo!",
+                    text: "El tipo de empleado se ha guardado exitosamente.",
+                    icon: "success"
+                });
+            }
+
+            if (editSuccess) {
+                Swal.fire({
+                    title: "¡Edición exitosa!",
+                    text: "El tipo de empleado se ha actualizado correctamente.",
+                    icon: "success"
+                });
+            }
+
+            $('#myTable').DataTable({
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+        });
+
+        // Función para mostrar SweetAlert de confirmación
+        function confirmDelete(event, id) {
+            event.preventDefault(); // Evita el comportamiento por defecto del botón
+
+            Swal.fire({
+                title: '¿Deseas Eliminar este dato?',
+                text: "Si estas seguro presiona Eliminar !",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Enviar solicitud POST para eliminar el empleado
+                    fetch('/TypeEmployee/DeleteConfirmed', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        body: new URLSearchParams({
+                            'id': id
+                        })
+                    }).then(response => {
+                        if (response.ok) {
+                            // Recargar la página si la eliminación fue exitosa
+                            window.location.reload();
+                        } else {
+                            Swal.fire('Error', 'No se pudo eliminar el empleado.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}
+
+

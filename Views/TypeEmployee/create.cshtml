@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "New TypeEmployee";
+}
+
+<h1>@ViewData["Title"]</h1>
+<br />
+
+@section styles
+{
+    <link href="~/lib/datatables.net-bs5/datatables.bootstrap5.min.css" rel="stylesheet" />
+}
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <a asp-controller="TypeEmployee" asp-action="Index" class="btn btn-success">Regresar</a><br />
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form id="contactForm" asp-controller="TypeEmployee" asp-action="Save" method="post">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @Html.ValidationSummary()
+                </div>
+            }
+            <div class="mb-3">
+                <label class="form-label" for="Nombre">Nombre</label>
+                <input class="form-control" id="Nombre" name="Nombre" type="text" placeholder="Tipo" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="EsActivo">Estado</label>
+                <select id="EsActivo" class="form-control" name="EsActivo" required>
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <br /><button type="submit" class="btn btn-success">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/lib/datatables.net/datatables.js"></script>
+    <script src="~/lib/datatables.net/datatables.min.js"></script>
+    <script src="~/lib/datatables.net-bs5/datatables.bootstrap5.min.js"></script>
+    <script>let table = new DataTable('#Table');</script>
+}
